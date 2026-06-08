@@ -83,8 +83,8 @@ RAG-PDF-Assistant/
 ### Clone Repository
 
 ```bash
-git clone <your-repo-link>
-cd RAG-PDF-Assistant
+git clone https://github.com/GaziAman-Khan/RAG-learn-code/tree/main
+cd RAG-learn-code
 ```
 
 ### Install Dependencies
