@@ -22,7 +22,7 @@ Traditional document search relies on keyword matching and manual reading, which
 * Gemini-based Response Generation
 * Persistent Vector Storage with Qdrant
 * Interactive Streamlit Interface
-* Event-Driven Processing using Inngest
+* Event-driven PDF ingestion and query processing using Inngest functions
 * Docker-based Containerized Setup
 * Local Deployment
 
@@ -49,10 +49,32 @@ Traditional document search relies on keyword matching and manual reading, which
 
 ## System Architecture
 
-Workflow:
+### FLOW 1: INGESTION
 
-Upload PDF → Extract Text → Create Embeddings → Store in Qdrant → Semantic Retrieval → Gemini Generates Answer → Streamlit Displays Response
+PDF Upload
+    ↓
+Inngest Event
+    ↓
+Chunk PDF
+    ↓
+Generate Embeddings
+    ↓
+Store in Qdrant
 
+
+### FLOW 2: QUERY
+
+User Question
+    ↓
+Inngest Event
+    ↓
+Embed Query
+    ↓
+Retrieve Top-K Chunks
+    ↓
+Gemini
+    ↓
+Answer
 
 ## Project Workflow
 
