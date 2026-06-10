@@ -52,28 +52,28 @@ Traditional document search relies on keyword matching and manual reading, which
 ### FLOW 1: INGESTION
 
 PDF Upload
-    ↓
+    ->
 Inngest Event
-    ↓
+    ->
 Chunk PDF
-    ↓
+    ->
 Generate Embeddings
-    ↓
+    ->
 Store in Qdrant
 
 
 ### FLOW 2: QUERY
 
 User Question
-    ↓
+    ->
 Inngest Event
-    ↓
+    ->
 Embed Query
-    ↓
+    ->
 Retrieve Top-K Chunks
-    ↓
+    ->
 Gemini
-    ↓
+    ->
 Answer
 
 ## Project Workflow
