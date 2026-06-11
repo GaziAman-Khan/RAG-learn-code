@@ -9,6 +9,7 @@ import os
 import requests
 
 load_dotenv()
+API_BASE = "https://rag-fastapi-tvkd.onrender.com"
 def run_async(coro):
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
@@ -46,6 +47,19 @@ async def send_rag_ingest_event(pdf_path: Path) -> None:
         )
     )
 
+def ingest_pdf_via_api(pdf_path: Path):
+
+    response = requests.post(
+        f"{API_BASE}/ingest",
+        json={
+            "pdf_path": str(pdf_path),
+            "source_id": pdf_path.name
+        }
+    )
+
+    response.raise_for_status()
+
+    return response.json()
 
 st.title("Upload a PDF to Ingest")
 uploaded = st.file_uploader("Choose a PDF", type=["pdf"], accept_multiple_files=False)
@@ -53,10 +67,11 @@ uploaded = st.file_uploader("Choose a PDF", type=["pdf"], accept_multiple_files=
 if uploaded is not None:
     with st.spinner("Uploading and triggering ingestion..."):
         path = save_uploaded_pdf(uploaded)
-        # Kick off the event and block until the send completes
-        run_async(send_rag_ingest_event(path))
-        # Small pause for user feedback continuity
+
+        result = ingest_pdf_via_api(path)
+
         time.sleep(0.3)
+
     st.success(f"Triggered ingestion for: {path.name}")
     st.caption("You can upload another PDF if you like.")
 

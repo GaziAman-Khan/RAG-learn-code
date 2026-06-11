@@ -4,6 +4,7 @@ import inngest
 import inngest.fast_api
 from dotenv import load_dotenv
 from google import genai
+from pydantic import BaseModel
 import uuid
 import os
 import datetime
@@ -97,10 +98,94 @@ async def rag_query_pdf_ai(ctx: inngest.Context):
         "source": found.sources,
         "num_contexts": len(found.contexts)
     }
+class QueryRequest(BaseModel):
+    question: str
+    top_k: int = 5
+
+class IngestRequest(BaseModel):
+    pdf_path: str
+    source_id: str
 
 app = FastAPI()
 
 @app.get("/")
+
+@app.post("/query")
+def query_pdf(req: QueryRequest):
+
+    query_vec = embed_texts([req.question])[0]
+
+    store = QdrantStorage()
+
+    found = store.search(
+    query_vector=query_vec,
+    top_k=req.top_k
+)
+
+    context_block = "\n\n".join(
+        f"- {c}" for c in found["contexts"]
+    )
+
+    user_context = (
+        "Use the following context to answer the question.\n\n"
+        f"Context:\n{context_block}\n\n"
+        f"Question: {req.question}\n"
+        "Answer concisely using the context above."
+    )
+
+    client = genai.Client(
+        api_key=os.getenv("GEMINI_API_KEY")
+    )
+
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=(
+            "You answer questions using only the provided context.\n\n"
+            + user_context
+        )
+    )
+
+    return {
+        "answers": response.text.strip(),
+        "source": found["sources"],
+        "num_contexts": len(found["contexts"])
+    }
+
+@app.post("/ingest")
+def ingest_pdf(req: IngestRequest):
+
+    chunks = load_and_chunk_pdf(req.pdf_path)
+
+    vecs = embed_texts(chunks)
+
+    ids = [
+        str(
+            uuid.uuid5(
+                uuid.NAMESPACE_URL,
+                name=f"{req.source_id}:{i}"
+            )
+        )
+        for i in range(len(chunks))
+    ]
+
+    payload = [
+        {
+            "source": req.source_id,
+            "text": chunks[i]
+        }
+        for i in range(len(chunks))
+    ]
+
+    QdrantStorage().upsert(
+        ids,
+        vecs,
+        payload
+    )
+
+    return {
+        "ingested": len(chunks)
+    }
+
 def home():
     return {"messages": "API is running"}
 
