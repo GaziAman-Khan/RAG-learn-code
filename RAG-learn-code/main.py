@@ -5,6 +5,8 @@ import inngest.fast_api
 from dotenv import load_dotenv
 from google import genai
 from pydantic import BaseModel
+from fastapi import UploadFile, File
+from pathlib import Path
 import uuid
 import os
 import datetime
@@ -152,9 +154,19 @@ def query_pdf(req: QueryRequest):
     }
 
 @app.post("/ingest")
-def ingest_pdf(req: IngestRequest):
+async def ingest_pdf(file: UploadFile = File(...)):
 
-    chunks = load_and_chunk_pdf(req.pdf_path)
+    uploads_dir = Path("uploads")
+    uploads_dir.mkdir(exist_ok=True)
+
+    pdf_path = uploads_dir / file.filename
+
+    contents = await file.read()
+
+    with open(pdf_path, "wb") as f:
+        f.write(contents)
+
+    chunks = load_and_chunk_pdf(str(pdf_path))
 
     vecs = embed_texts(chunks)
 
@@ -162,7 +174,7 @@ def ingest_pdf(req: IngestRequest):
         str(
             uuid.uuid5(
                 uuid.NAMESPACE_URL,
-                name=f"{req.source_id}:{i}"
+                name=f"{file.filename}:{i}"
             )
         )
         for i in range(len(chunks))
@@ -170,7 +182,7 @@ def ingest_pdf(req: IngestRequest):
 
     payload = [
         {
-            "source": req.source_id,
+            "source": file.filename,
             "text": chunks[i]
         }
         for i in range(len(chunks))

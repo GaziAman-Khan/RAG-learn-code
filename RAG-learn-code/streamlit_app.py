@@ -49,13 +49,14 @@ async def send_rag_ingest_event(pdf_path: Path) -> None:
 
 def ingest_pdf_via_api(pdf_path: Path):
 
-    response = requests.post(
-        f"{API_BASE}/ingest",
-        json={
-            "pdf_path": str(pdf_path),
-            "source_id": pdf_path.name
-        }
-    )
+    with open(pdf_path, "rb") as f:
+
+        response = requests.post(
+            f"{API_BASE}/ingest",
+            files={
+                "file": (pdf_path.name, f, "application/pdf")
+            }
+        )
 
     response.raise_for_status()
 
@@ -127,20 +128,37 @@ def wait_for_run_output(event_id: str, timeout_s: float = 120.0, poll_interval_s
 
 with st.form("rag_query_form"):
     question = st.text_input("Your question")
-    top_k = st.number_input("How many chunks to retrieve", min_value=1, max_value=20, value=5, step=1)
+    top_k = st.number_input(
+        "How many chunks to retrieve",
+        min_value=1,
+        max_value=20,
+        value=5,
+        step=1
+    )
+
     submitted = st.form_submit_button("Ask")
 
     if submitted and question.strip():
-        with st.spinner("Sending event and generating answer..."):
-            # Fire-and-forget event to Inngest for observability/workflow
-            event_id = run_async(send_rag_query_event(question.strip(), int(top_k)))
-            # Poll the local Inngest API for the run's output
-            output = wait_for_run_output(event_id)
+        with st.spinner("Searching documents and generating answer..."):
+
+            response = requests.post(
+                f"{API_BASE}/query",
+                json={
+                    "question": question.strip(),
+                    "top_k": int(top_k)
+                }
+            )
+
+            response.raise_for_status()
+
+            output = response.json()
+            st.write(output)
             answer = output.get("answers", "")
             sources = output.get("source", [])
 
         st.subheader("Answer")
         st.write(answer or "(No answer)")
+
         if sources:
             st.caption("Sources")
             for s in sources:
