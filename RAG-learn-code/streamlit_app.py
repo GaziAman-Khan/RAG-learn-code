@@ -63,6 +63,10 @@ def ingest_pdf_via_api(pdf_path: Path):
     return response.json()
 
 st.title("Upload a PDF to Ingest")
+st.markdown(
+    "**Developed by Gazi Aman Khan**\n"
+    "*AI & ML Engineer | GenAI & Data Science Enthusiast*"
+)
 uploaded = st.file_uploader("Choose a PDF", type=["pdf"], accept_multiple_files=False)
 
 if uploaded is not None:
@@ -77,6 +81,9 @@ if uploaded is not None:
     st.caption("You can upload another PDF if you like.")
 
 st.divider()
+st.caption(
+    "Retrieval-Augmented Generation (RAG) powered by FastAPI, Streamlit, Gemini AI, and Qdrant Vector Database"
+)
 st.title("Ask a question about your PDFs")
 
 
