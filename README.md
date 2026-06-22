@@ -1,111 +1,196 @@
-# RAG-learn-code
-RAG Project Initialization
 # RAG PDF Assistant
 
-AI-powered PDF Question Answering system built using Retrieval-Augmented Generation (RAG) to enable intelligent document search and contextual responses from uploaded PDFs.
+AI-powered PDF Question Answering system built using Retrieval-Augmented Generation (RAG), FastAPI, Streamlit, Gemini, and Qdrant Vector Database.
+
+The application enables users to upload PDF documents, perform semantic search, and receive context-aware answers generated directly from the document content.
+
+---
+
+## Live Demo
+
+**Frontend Application:**
+https://rag-pdf-application.streamlit.app/
+
+**GitHub Repository:**
+https://github.com/GaziAman-Khan/RAG-learn-code
+
+---
 
 ## Overview
 
-Reading large PDF documents and manually searching for information can be time-consuming. RAG PDF Assistant solves this problem by combining semantic search and Generative AI to retrieve relevant document content and generate context-aware answers.
+RAG PDF Assistant is an end-to-end AI application that combines document processing, semantic search, vector databases, and Large Language Models (LLMs) to create an intelligent document question-answering system.
 
-This project allows users to upload PDFs, ask questions, and receive intelligent responses through an interactive web interface.
+Instead of manually searching through lengthy PDFs, users can ask natural language questions and receive accurate, context-aware answers grounded in the uploaded document.
+
+---
 
 ## Problem Statement
 
-Traditional document search relies on keyword matching and manual reading, which often misses context and slows information retrieval. This project was developed to create an AI-driven system capable of understanding document meaning and answering user queries more efficiently.
+Traditional document search relies heavily on keyword matching and manual reading, making it difficult to quickly locate relevant information.
+
+This project addresses that challenge by:
+
+* Converting document content into semantic embeddings
+* Storing embeddings in a vector database
+* Retrieving relevant content using similarity search
+* Generating contextual answers using Gemini
+
+---
 
 ## Features
 
-* PDF Upload and Processing
-* Semantic Search using Vector Database
-* Context-Aware Question Answering
-* Gemini-based Response Generation
-* Persistent Vector Storage with Qdrant
-* Interactive Streamlit Interface
-* Event-driven PDF ingestion and query processing using Inngest functions
-* Docker-based Containerized Setup
-* Local Deployment
+* Upload PDF documents through a web interface
+* Automatic text extraction and chunking
+* Semantic embeddings using Gemini Embedding API
+* Vector storage and retrieval with Qdrant
+* Context-aware question answering using Gemini
+* Adjustable Top-K retrieval
+* Interactive Streamlit user interface
+* FastAPI backend APIs
+* Cloud deployment using Render and Streamlit Community Cloud
+
+---
 
 ## Tech Stack
 
-**Frontend**
+### Frontend
 
 * Streamlit
 
-**Backend**
+### Backend
 
 * FastAPI
 
-**AI / RAG**
+### AI & RAG
 
-* Gemini API
-* Qdrant Vector Database
+* Google Gemini API
+* Gemini Embeddings
 * Retrieval-Augmented Generation (RAG)
 
-**Workflow & Infrastructure**
+### Vector Database
 
-* Inngest
-* Docker
+* Qdrant Cloud
+
+### Deployment
+
+* Streamlit Community Cloud
+* Render
+
+---
 
 ## System Architecture
 
-### FLOW 1: INGESTION
+### PDF Ingestion Flow
 
-PDF Upload
-    ->
-Inngest Event
-    ->
-Chunk PDF
-    ->
-Generate Embeddings
-    ->
-Store in Qdrant
+User Uploads PDF
 
+↓
 
-### FLOW 2: QUERY
+Streamlit Frontend
+
+↓
+
+FastAPI Backend
+
+↓
+
+PDF Text Extraction
+
+↓
+
+Document Chunking
+
+↓
+
+Gemini Embeddings
+
+↓
+
+Qdrant Vector Database
+
+---
+
+### Question Answering Flow
 
 User Question
-    ->
-Inngest Event
-    ->
-Embed Query
-    ->
-Retrieve Top-K Chunks
-    ->
-Gemini
-    ->
-Answer
+
+↓
+
+FastAPI Backend
+
+↓
+
+Question Embedding
+
+↓
+
+Qdrant Similarity Search
+
+↓
+
+Top-K Relevant Chunks
+
+↓
+
+Gemini LLM
+
+↓
+
+Generated Answer
+
+↓
+
+Streamlit Frontend
+
+---
 
 ## Project Workflow
 
+### Document Ingestion
+
 1. User uploads a PDF document.
-2. Text is extracted and processed.
-3. Document embeddings are created and stored in Qdrant.
-4. User submits a question.
-5. Relevant document chunks are retrieved through semantic search.
-6. Gemini generates a context-aware response.
-7. Streamlit displays the final answer.
+2. Text is extracted from the PDF.
+3. Content is divided into smaller chunks.
+4. Gemini generates embeddings for each chunk.
+5. Embeddings are stored in Qdrant.
 
-## Project Structure
+### Question Answering
 
-```bash
-RAG-PDF-Assistant/
-│
-├── app.py
-├── main.py
-├── qdrant_storage.py
-├── streamlit_app.py
-├── Dockerfile
-├── requirements.txt
-└── README.md
-```
+1. User submits a question.
+2. The question is converted into an embedding.
+3. Qdrant retrieves the most relevant chunks.
+4. Retrieved context is sent to Gemini.
+5. Gemini generates a context-aware response.
+6. The answer is displayed in the Streamlit application.
 
-## Installation & Setup
+---
+
+## Screenshots
+
+### PDF Upload Interface
+
+<img width="1915" height="838" alt="image" src="https://github.com/user-attachments/assets/62ac75a0-989f-4b81-b51b-6488eee3b735" />
+
+
+### Question Answering Interface
+
+<img width="959" height="416" alt="image" src="https://github.com/user-attachments/assets/75090b9d-4457-44d9-a169-3e5c5947b5d2" />
+
+
+### Generated Response
+
+<img width="960" height="416" alt="image" src="https://github.com/user-attachments/assets/e7ac0ac8-75bd-4747-a01c-af30f1957bc9" />
+
+
+---
+
+## Installation
 
 ### Clone Repository
 
 ```bash
-git clone https://github.com/GaziAman-Khan/RAG-learn-code/tree/main
+git clone https://github.com/GaziAman-Khan/RAG-learn-code.git
+
 cd RAG-learn-code
 ```
 
@@ -115,7 +200,7 @@ cd RAG-learn-code
 pip install -r requirements.txt
 ```
 
-### Run Backend
+### Run FastAPI Backend
 
 ```bash
 uvicorn main:app --reload
@@ -124,15 +209,24 @@ uvicorn main:app --reload
 ### Run Streamlit Frontend
 
 ```bash
-streamlit run app.py
+streamlit run streamlit_app.py
 ```
 
-## Usage
+---
 
-1. Launch the application locally.
-2. Upload a PDF document.
-3. Ask questions related to the document.
-4. Receive AI-generated contextual answers.
+## Environment Variables
+
+Create a `.env` file and add:
+
+```env
+GEMINI_API_KEY=your_api_key
+
+QDRANT_URL=your_qdrant_url
+
+QDRANT_API_KEY=your_qdrant_api_key
+```
+
+---
 
 ## Key Learnings
 
@@ -140,13 +234,30 @@ Through this project, I gained hands-on experience with:
 
 * Retrieval-Augmented Generation (RAG)
 * Vector Databases and Semantic Search
+* Embedding Models
 * FastAPI Backend Development
-* Event-Driven Processing using Inngest
-* Docker-based Application Setup
-* Building AI-powered Document Intelligence Systems
+* Streamlit Application Development
+* API Integration
+* Cloud Deployment
+* Building End-to-End AI Applications
 
+---
+
+## Future Improvements
+
+* Multi-document querying
+* Source citations in responses
+* Conversation memory
+* Faster batch embedding generation
+* Support for DOCX and TXT files
+* Advanced reranking strategies
+
+---
 
 ## Author
 
 **Gazi Aman Khan**
+
 AI & ML Engineer | GenAI & Data Science Enthusiast
+
+GitHub: https://github.com/GaziAman-Khan
